@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import {
   Switch, Route, Link, useRouteMatch, useHistory
 } from "react-router-dom";
+import { useField } from './hooks/index';
 
 const Notification = ({ notification }) => {
   const style = {
@@ -83,9 +84,10 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('');
-  const [author, setAuthor] = useState('');
-  const [info, setInfo] = useState('');
+  const content = useField('text');
+  const author = useField('text');
+  const info = useField('text');
+
   let history = useHistory();
 
   const handleSubmit = (e) => {
@@ -107,17 +109,22 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           Content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input { ...content } reset='' />
         </div>
         <div>
           Author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input { ...author } reset='' />
         </div>
         <div>
           Url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input { ...info } reset='' />
         </div>
         <button type='submit'>Create</button>
+        <button type='reset' onClick={() => {
+          content.reset();
+          author.reset();
+          info.reset();
+        }}>Reset</button>
       </form>
     </div>
   )
@@ -152,7 +159,6 @@ const App = () => {
   const anecdote = match
     ? anecdotes.find((a) => a.id === Number(match.params.id))
     : null
-  console.log(match, anecdote);
   
   const addNew = (anecdote) => {
     anecdote.id = (Math.random() * 10000).toFixed(0)
