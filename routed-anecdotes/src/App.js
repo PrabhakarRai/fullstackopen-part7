@@ -1,7 +1,23 @@
 import React, { useState } from 'react'
 import {
-  Switch, Route, Link, useRouteMatch
+  Switch, Route, Link, useRouteMatch, useHistory
 } from "react-router-dom";
+
+const Notification = ({ notification }) => {
+  const style = {
+    border: 'solid',
+    padding: 10,
+    borderWidth: 1
+  };
+  if (notification === '') {
+    return null;
+  }
+  return (
+    <div style={style}>
+      {notification}
+    </div>
+  );
+};
 
 const Menu = () => {
   const padding = {
@@ -67,19 +83,22 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
-
+  const [content, setContent] = useState('');
+  const [author, setAuthor] = useState('');
+  const [info, setInfo] = useState('');
+  let history = useHistory();
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
+
     props.addNew({
-      content,
-      author,
-      info,
+      content: e.target.content.value,
+      author: e.target.author.value,
+      info: e.target.info.value,
       votes: 0
-    })
+    });
+    props.handleNotification(`Added ${e.target.content.value}`);
+    history.push('/anecdotes');
   }
 
   return (
@@ -124,6 +143,10 @@ const App = () => {
   ])
 
   const [notification, setNotification] = useState('')
+  const notificationHandler = (text) => {
+    setNotification(text);
+    setTimeout(() => setNotification(''), 5000);
+  }
 
   const match = useRouteMatch('/anecdotes/:id');
   const anecdote = match
@@ -154,6 +177,7 @@ const App = () => {
     <div>
       <h1>Software Anecdotes</h1>
       <Menu />
+      <Notification notification={notification} />
       <Switch>
         <Route path='/anecdotes/:id'>
           <Anecdote anecdote={anecdote} />
@@ -165,7 +189,7 @@ const App = () => {
           <About />
         </Route>
         <Route path='/create'>
-          <CreateNew addNew={addNew} />
+          <CreateNew addNew={addNew} handleNotification={notificationHandler} />
         </Route>
       </Switch>
       <Footer />
