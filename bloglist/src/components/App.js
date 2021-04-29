@@ -12,7 +12,6 @@ import { loginUser, logoutUser } from '../reducers/user';
 import Menu from './Nav';
 import Blog from './Blog';
 import Login from './Login';
-import Logout from './Logout';
 import Toggleable from './Toggleable';
 import BlogCreateForm from './BlogCreateForm';
 import Users from './Users';
@@ -128,11 +127,10 @@ const App = () => {
   }
   return (
     <div>
-      <Menu />
+      <Menu user={user} logoutHandler={logoutHandler} />
       <ErrorNotification />
       <SuccessNotification />
       <h2>Blogs</h2>
-      <Logout user={user} logoutHandler={logoutHandler} />
       <Switch>
         <Route path='/users'>
           <Users />
