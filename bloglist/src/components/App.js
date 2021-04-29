@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import blogService from '../services/blogs';
 import loginService from '../services/login';
 import { SuccessNotification, ErrorNotification } from './Notification';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateNotification, clearNotification } from '../reducers/notification';
 import { initBlog, createBlog, updateBlog, deleteBlog } from '../reducers/blog';
+import { loginUser, logoutUser } from '../reducers/user';
 import Blog from './Blog';
 import Login from './Login';
 import Logout from './Logout';
@@ -13,9 +14,9 @@ import BlogCreateForm from './BlogCreateForm';
 import '../index.css';
 
 const App = () => {
-  const [user, setUser] = useState(null);
   const dispatch = useDispatch();
   const blogs = useSelector((s) => s.blogs);
+  const user = useSelector((s) => s.user);
   const blogFormRef = useRef();
 
   const setSuccessMsgWrapper = (msg, clearTime = 10000) => {
@@ -40,7 +41,7 @@ const App = () => {
     const loggedUserJson = window.localStorage.getItem('loggedInBlogUser');
     if (loggedUserJson) {
       const user = JSON.parse(loggedUserJson);
-      setUser(user);
+      dispatch(loginUser(user));
       blogService.setToken(user.token);
     }
   }, []);
@@ -53,7 +54,7 @@ const App = () => {
         'loggedInBlogUser', JSON.stringify(user)
       );
       setSuccessMsgWrapper('Logged in Successfully');
-      setUser(user);
+      dispatch(loginUser(user));
     } catch (e) {
       setErrorMsgWrapper('Login Error - incorrect username or password');
     }
@@ -102,7 +103,7 @@ const App = () => {
   const logoutHandler = () => {
     window.localStorage.removeItem('loggedInBlogUser');
     blogService.setToken(null);
-    setUser(null);
+    dispatch(logoutUser());
     setSuccessMsgWrapper('Logged out successfully');
   };
   if (user === null) {
