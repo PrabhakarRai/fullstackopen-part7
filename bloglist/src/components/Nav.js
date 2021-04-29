@@ -8,6 +8,7 @@ const Menu = () => {
   return (
     <div>
       <Link to='/' style={padding}>Home</Link>
+      <Link to='/blogs' style={padding}>Blogs</Link>
       <Link to='/users' style={padding}>Users</Link>
     </div>
   );

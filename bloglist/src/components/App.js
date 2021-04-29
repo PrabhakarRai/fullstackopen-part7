@@ -16,6 +16,7 @@ import Logout from './Logout';
 import Toggleable from './Toggleable';
 import BlogCreateForm from './BlogCreateForm';
 import Users from './Users';
+import BlogView from './BlogView';
 import '../index.css';
 
 const App = () => {
@@ -135,6 +136,9 @@ const App = () => {
       <Switch>
         <Route path='/users'>
           <Users />
+        </Route>
+        <Route path='/blogs'>
+          <BlogView updateLikesHandler={updateLikesHandler} />
         </Route>
         <Route path='/'>
           {blogs.map(blog =>
