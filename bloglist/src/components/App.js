@@ -1,4 +1,7 @@
 import React, { useEffect, useRef } from 'react';
+import {
+  Switch, Route,
+} from 'react-router-dom';
 import blogService from '../services/blogs';
 import loginService from '../services/login';
 import { SuccessNotification, ErrorNotification } from './Notification';
@@ -6,11 +9,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateNotification, clearNotification } from '../reducers/notification';
 import { initBlog, createBlog, updateBlog, deleteBlog } from '../reducers/blog';
 import { loginUser, logoutUser } from '../reducers/user';
+import Menu from './Nav';
 import Blog from './Blog';
 import Login from './Login';
 import Logout from './Logout';
 import Toggleable from './Toggleable';
 import BlogCreateForm from './BlogCreateForm';
+import Users from './Users';
 import '../index.css';
 
 const App = () => {
@@ -106,38 +111,48 @@ const App = () => {
     dispatch(logoutUser());
     setSuccessMsgWrapper('Logged out successfully');
   };
+
   if (user === null) {
     return (
-      <>
+      <div>
+        <Menu />
         <ErrorNotification />
         <SuccessNotification />
         <h1>Login to the application</h1>
         <Login
           formSubmitHandler={loginSubmitHandler}
         />
-      </>
+      </div>
     );
   }
   return (
     <div>
+      <Menu />
       <ErrorNotification />
       <SuccessNotification />
       <h2>Blogs</h2>
       <Logout user={user} logoutHandler={logoutHandler} />
-      {blogs.map(blog =>
-        <Blog
-          key={blog.id}
-          data={blog}
-          updateLikesHandler={updateLikesHandler}
-          deleteBlogHandler={deleteBlogPost}
-          username={user.username}
-        />
-      )}
-      <Toggleable buttonLable='Add New Blog' ref={blogFormRef}>
-        <BlogCreateForm
-          formSubmitHandler={blogSubmitHandler}
-        />
-      </Toggleable>
+      <Switch>
+        <Route path='/users'>
+          <Users />
+        </Route>
+        <Route path='/'>
+          {blogs.map(blog =>
+            <Blog
+              key={blog.id}
+              data={blog}
+              updateLikesHandler={updateLikesHandler}
+              deleteBlogHandler={deleteBlogPost}
+              username={user.username}
+            />
+          )}
+          <Toggleable buttonLable='Add New Blog' ref={blogFormRef}>
+            <BlogCreateForm
+              formSubmitHandler={blogSubmitHandler}
+            />
+          </Toggleable>
+        </Route>
+      </Switch>
     </div>
   );
 };
