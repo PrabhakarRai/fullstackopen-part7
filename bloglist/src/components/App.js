@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import blogService from '../services/blogs';
 import loginService from '../services/login';
 import { SuccessNotification, ErrorNotification } from './Notification';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateNotification, clearNotification } from '../reducers/notification';
+import { initBlog, createBlog, updateBlog, deleteBlog } from '../reducers/blog';
 import Blog from './Blog';
 import Login from './Login';
 import Logout from './Logout';
@@ -12,9 +13,9 @@ import BlogCreateForm from './BlogCreateForm';
 import '../index.css';
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const dispatch = useDispatch();
+  const blogs = useSelector((s) => s.blogs);
   const blogFormRef = useRef();
 
   const setSuccessMsgWrapper = (msg, clearTime = 10000) => {
@@ -30,7 +31,7 @@ const App = () => {
   useEffect(() => {
     const fetchInitialBlogs = async () => {
       const blogs = await blogService.getAll();
-      setBlogs(blogs);
+      dispatch(initBlog(blogs));
     };
     fetchInitialBlogs();
   }, []);
@@ -60,7 +61,7 @@ const App = () => {
   const blogSubmitHandler = async (author, title, url) => {
     try {
       const res = await blogService.createBlog({ author, title, url });
-      setBlogs(blogs.concat(res));
+      dispatch(createBlog(res));
       setSuccessMsgWrapper(`Added - ${res.title} into blogs list.`);
       blogFormRef.current.toggleVisibility();
     } catch (e) {
@@ -70,10 +71,10 @@ const App = () => {
   const updateLikesHandler = async (id, likes) => {
     try {
       const res = await blogService.updateLikes(id, likes);
-      const newBlogs = blogs.map(b => b.id !== res.id ? b : res).sort((a, b) => {
-        return b.likes - a.likes;
-      });
-      setBlogs(newBlogs);
+      dispatch(updateBlog(res));
+      // const newBlogs = blogs.map(b => b.id !== res.id ? b : res).sort((a, b) => {
+      //   return b.likes - a.likes;
+      // });
       setSuccessMsgWrapper(`Liked ${res.title} by ${res.author}`);
     } catch (e) {
       setErrorMsgWrapper(e.message);
@@ -87,7 +88,7 @@ const App = () => {
         if (conf) {
           const res = await blogService.deleteBlog(id);
           if (res.status === 204) {
-            setBlogs(blogs.filter((b) => b.id !== id));
+            dispatch(deleteBlog(blog.id));
             setSuccessMsgWrapper(`Deleted ${blog.title}`);
           } else {
             setErrorMsgWrapper('Unknown error');

@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 export const ErrorNotification = () => {
-  const notification = useSelector((state) => state);
+  const notification = useSelector((state) => state.notification);
 
   if (
     notification === null
@@ -19,7 +19,7 @@ export const ErrorNotification = () => {
 
 
 export const SuccessNotification = () => {
-  const notification = useSelector((state) => state);
+  const notification = useSelector((state) => state.notification);
 
   if (
     notification === null
